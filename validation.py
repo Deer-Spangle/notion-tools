@@ -87,6 +87,38 @@ def validate_required_fields(all_cards: list[dict]) -> None:
             print(f"INVALID: Tags not set for {card_link}")
 
 
+def validate_unique_titles(all_cards: list[dict]) -> None:
+    titles = {}
+    for card in all_cards:
+        card_link = card["url"]
+        title = card["properties"]["Name"]["title"][0]["text"]["content"]
+        if title in titles:
+            print(f"INVALID: Title overlap between {card_link} and {titles[title]}")
+        titles[title] = card_link
+
+
+def validate_tags(all_cards: list[dict]) -> None:
+    nsfw_tags = [
+        "vaginal sex", "anal sex", "tail sex", "tribbing", "masturbation", "cunnilingus", "fellatio", "autocunnilingus",
+        "autofellatio", "sex toy", "strap on", "cum inflation", "impregnation", "condom", "public use",
+        "fucking machine", "face sitting", "hyper", "cuckoldry", "pee", "public", "rimming", "vore", "knotting",
+        "nipples", "snakepeen",
+    ]
+    group_tags = ["solo", "duo", "group"]
+    for card in all_cards:
+        card_link = card["url"]
+        card_tags = [tag["name"] for tag in card["properties"]["Tags"]["multi_select"]]
+        card_nsfw_tags = [tag for tag in card_tags if tag in nsfw_tags]
+        is_nsfw = card["properties"]["NSFW"]["checkbox"]
+        if card_nsfw_tags and not is_nsfw:
+            print(f"INVALID: Card has nsfw tags {card_nsfw_tags} but not marked nsfw: {card_link}")
+        card_group_tags = [tag for tag in card_tags if tag in group_tags]
+        if not card_group_tags:
+            print(f"INVALID: Card has no group tags: {card_link}")
+        if len(card_group_tags) > 1:
+            print(f"INVALID: Card has too many group tags: {card_link}")
+
+
 def main(config: dict) -> None:
     notion = Client(auth=config["notion"]["integration_secret"])
     art_db_resp = notion.databases.retrieve(config["notion"]["art_db_id"])
@@ -98,8 +130,10 @@ def main(config: dict) -> None:
     validate_final_files_depends_on_progress(all_art)
     # Check that artist, character, etc is set
     validate_required_fields(all_art)
-    # TODO: Check that titles are unique
-    # TODO: Check nsfw tags are nsfw
+    # Check that titles are unique
+    validate_unique_titles(all_art)
+    # Check nsfw tags and group tags
+    validate_tags(all_art)
     print("---")
 
 
