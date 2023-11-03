@@ -53,6 +53,20 @@ def validate_character_owners(all_cards: list[dict]) -> None:
             print(f"INVALID: Owners for card should be {correct_owners} in card: {card_link}")
 
 
+def validate_final_files_depends_on_progress(all_cards: list[dict]) -> None:
+    for card in all_cards:
+        card_link = card["url"]
+        progress = card["properties"]["Progress"]["select"]["name"]
+        is_complete = progress == "Complete"
+        file_list = card["properties"]["Final"]["files"]
+        has_files = bool(file_list)
+        if is_complete != has_files:
+            if is_complete:
+                print(f"INVALID: Missing final files for completed card: {card_link}")
+            else:
+                print(f"INVALID: Got final files for incomplete card: {card_link}")
+
+
 def main(config: dict) -> None:
     notion = Client(auth=config["notion"]["integration_secret"])
     art_db_resp = notion.databases.retrieve(config["notion"]["art_db_id"])
@@ -60,8 +74,8 @@ def main(config: dict) -> None:
     print(f"There are {len(all_art)} total art cards")
     # Check that characters and character owners line up
     validate_character_owners(all_art)
-    # TODO: Check that completed has final
-    # TODO: Check that incomplete does not have final
+    # Check that completed has final, and incomplete does not
+    validate_final_files_depends_on_progress(all_art)
     # TODO: Check that artist is set
     # TODO: Check that titles are unique
     print("---")
