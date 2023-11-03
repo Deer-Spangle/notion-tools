@@ -104,7 +104,7 @@ def validate_tags(all_cards: list[dict]) -> None:
         "fucking machine", "face sitting", "hyper", "cuckoldry", "pee", "rimming", "knotting",
         "nipples", "snakepeen",
     ]
-    group_tags = ["solo", "duo", "group"]
+    group_tags = ["solo", "duo", "group", "physical"]
     for card in all_cards:
         card_link = card["url"]
         card_tags = [tag["name"] for tag in card["properties"]["Tags"]["multi_select"]]
