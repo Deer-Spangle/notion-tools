@@ -115,7 +115,8 @@ def validate_tags(all_cards: list[dict]) -> None:
         card_group_tags = [tag for tag in card_tags if tag in group_tags]
         if not card_group_tags:
             print(f"INVALID: Card has no group tags: {card_link}")
-        if len(card_group_tags) > 1:
+        has_multiple_versions = card["properties"]["Multiple versions/images"]["checkbox"]
+        if len(card_group_tags) > 1 and not has_multiple_versions:
             print(f"INVALID: Card has too many group tags: {card_link}")
 
 
