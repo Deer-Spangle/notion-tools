@@ -4,6 +4,8 @@ import os
 import requests
 from notion_client import Client
 
+from common import list_art_by_filter
+
 
 def search_databases(notion: Client, query: str = None) -> dict:
     return notion.search(
@@ -32,46 +34,35 @@ def list_spangle_to_post(notion: Client, db_resp: dict) -> list[dict]:
 
 
 def list_art_to_post(notion: Client, db_resp: dict, posted_to: list[str], character_owners: list[str]) -> list[dict]:
-    next_token = None
-    results = []
-    while True:
-        print("Fetching a page of art results")
-        resp = notion.databases.query(
-            db_resp["id"],
-            start_cursor=next_token,
-            filter={
-                "and": [
-                    *[
-                        {
-                            "property": "Posted to",
-                            "multi_select": {
-                                "does_not_contain": gallery,
-                            },
-                        }
-                        for gallery in posted_to
-                    ],
-                    *[
-                        {
-                            "property": "Character owners",
-                            "multi_select": {
-                                "contains": character,
-                            },
-                        }
-                        for character in character_owners
-                    ],
-                    {
-                        "property": "Progress",
-                        "select": {
-                            "equals": "Complete",
-                        },
+    card_filter = {
+        "and": [
+            *[
+                {
+                    "property": "Posted to",
+                    "multi_select": {
+                        "does_not_contain": gallery,
                     },
-                ]
-            }
-        )
-        results += resp["results"]
-        next_token = resp.get("next_cursor")
-        if next_token is None:
-            return results
+                }
+                for gallery in posted_to
+            ],
+            *[
+                {
+                    "property": "Character owners",
+                    "multi_select": {
+                        "contains": character,
+                    },
+                }
+                for character in character_owners
+            ],
+            {
+                "property": "Progress",
+                "select": {
+                    "equals": "Complete",
+                },
+            },
+        ]
+    }
+    return list_art_by_filter(notion, db_resp, card_filter)
 
 
 def download_post(post: dict, folder: str) -> None:
