@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "notion-tools"
+version = "0.1.0"
+description = "Selection of notion tools for my usage"
+authors = ["Deer-Spangle <deer@spangle.org.uk>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+notion-client = "^2.0.0"
+requests = "^2.31.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
