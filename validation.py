@@ -101,7 +101,7 @@ def validate_tags(all_cards: list[dict]) -> None:
     nsfw_tags = [
         "vaginal sex", "anal sex", "tail sex", "tribbing", "masturbation", "cunnilingus", "fellatio", "autocunnilingus",
         "autofellatio", "sex toy", "strap on", "cum inflation", "impregnation", "condom", "public use",
-        "fucking machine", "face sitting", "hyper", "cuckoldry", "pee", "public", "rimming", "vore", "knotting",
+        "fucking machine", "face sitting", "hyper", "cuckoldry", "pee", "rimming", "knotting",
         "nipples", "snakepeen",
     ]
     group_tags = ["solo", "duo", "group"]
