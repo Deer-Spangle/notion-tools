@@ -67,6 +67,26 @@ def validate_final_files_depends_on_progress(all_cards: list[dict]) -> None:
                 print(f"INVALID: Got final files for incomplete card: {card_link}")
 
 
+def validate_required_fields(all_cards: list[dict]) -> None:
+    for card in all_cards:
+        card_link = card["url"]
+        artists = card["properties"]["Artist"]["multi_select"]
+        if not artists:
+            print(f"INVALID: Missing artist for {card_link}")
+        characters = card["properties"]["Characters"]["multi_select"]
+        if not characters:
+            print(f"INVALID: Missing characters for {card_link}")
+        owners = card["properties"]["Character owners"]["multi_select"]
+        if not owners:
+            print(f"INVALID: Missing character owners for {card_link}")
+        progress = card["properties"]["Progress"]["select"]
+        if not progress or progress["name"].lower() == "empty":
+            print(f"INVALID: Progress is not set for {card_link}")
+        tags = card["properties"]["Tags"]["multi_select"]
+        if not tags:
+            print(f"INVALID: Tags not set for {card_link}")
+
+
 def main(config: dict) -> None:
     notion = Client(auth=config["notion"]["integration_secret"])
     art_db_resp = notion.databases.retrieve(config["notion"]["art_db_id"])
@@ -76,8 +96,10 @@ def main(config: dict) -> None:
     validate_character_owners(all_art)
     # Check that completed has final, and incomplete does not
     validate_final_files_depends_on_progress(all_art)
-    # TODO: Check that artist is set
+    # Check that artist, character, etc is set
+    validate_required_fields(all_art)
     # TODO: Check that titles are unique
+    # TODO: Check nsfw tags are nsfw
     print("---")
 
 
